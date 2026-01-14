@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Camera, Upload, X, RotateCcw, Zap, ArrowLeft } from 'lucide-react'
 import { classifyImage } from '../lib/classifier'
 import { saveScan } from '../lib/database'
+import { saveTrainingImage } from '../lib/trainingService'
 
 function ScanPage({ selectedCrop, setScanResult }) {
   const navigate = useNavigate()
@@ -121,6 +122,17 @@ function ScanPage({ selectedCrop, setScanResult }) {
 
       // Save to database using new service
       await saveScan(scanData)
+
+      // Automatically save image for training
+      await saveTrainingImage({
+        image: capturedImage,
+        crop: selectedCrop,
+        label: result.disease,
+        predictedLabel: result.disease,
+        confidence: result.confidence,
+        verified: false,
+        source: 'scan'
+      })
 
       navigate('/results')
     } catch (err) {

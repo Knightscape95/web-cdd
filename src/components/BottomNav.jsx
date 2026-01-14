@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { Home, History, Settings, Cloud } from 'lucide-react'
+import { Home, History, Settings, Cloud, IndianRupee } from 'lucide-react'
 
 function BottomNav() {
   const navItems = [
     { to: '/', icon: Home, label: 'मुख्यपृष्ठ', labelEn: 'Home' },
+    { to: '/mandi', icon: IndianRupee, label: 'मंडी भाव', labelEn: 'Mandi' },
     { to: '/weather', icon: Cloud, label: 'हवामान', labelEn: 'Weather' },
     { to: '/history', icon: History, label: 'इतिहास', labelEn: 'History' },
     { to: '/settings', icon: Settings, label: 'सेटिंग्ज', labelEn: 'Settings' },

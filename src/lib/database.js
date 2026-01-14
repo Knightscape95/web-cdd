@@ -1,12 +1,12 @@
 /**
  * Database Service using IndexedDB
- * Stores weather history, scan records, and images
+ * Stores weather history, scan records, images, and training data
  */
 
 import { openDB } from 'idb'
 
 const DB_NAME = 'crop-disease-db'
-const DB_VERSION = 2
+const DB_VERSION = 3 // Upgraded to version 3 for training_data store
 
 // Initialize database with all stores
 async function initDB() {
@@ -45,6 +45,15 @@ async function initDB() {
         const imgStore = db.createObjectStore('images', { keyPath: 'id', autoIncrement: true })
         imgStore.createIndex('scanId', 'scanId')
         imgStore.createIndex('timestamp', 'timestamp')
+      }
+
+      // Training Data Store - for storing images with labels for model training
+      if (!db.objectStoreNames.contains('training_data')) {
+        const trainingStore = db.createObjectStore('training_data', { keyPath: 'id', autoIncrement: true })
+        trainingStore.createIndex('crop', 'crop')
+        trainingStore.createIndex('label', 'label')
+        trainingStore.createIndex('timestamp', 'timestamp')
+        trainingStore.createIndex('verified', 'verified')
       }
     }
   })

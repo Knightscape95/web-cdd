@@ -9,6 +9,7 @@ import ResultsPage from './pages/ResultsPage'
 import HistoryPage from './pages/HistoryPage'
 import SettingsPage from './pages/SettingsPage'
 import WeatherPage from './pages/WeatherPage'
+import MandiPage from './pages/MandiPage'
 
 // Components
 import BottomNav from './components/BottomNav'
@@ -43,8 +44,8 @@ function AppContent() {
     }
   }, [])
 
-  // Hide bottom nav on scan and weather pages
-  const showBottomNav = !['/scan', '/weather'].includes(location.pathname)
+  // Hide bottom nav on scan, weather, and mandi pages
+  const showBottomNav = !['/scan', '/weather', '/mandi'].includes(location.pathname)
 
   return (
     <div className="page-container">
@@ -97,6 +98,7 @@ function AppContent() {
               />
             } 
           />
+          <Route path="/mandi" element={<MandiPage />} />
         </Routes>
       </main>
 

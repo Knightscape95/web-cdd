@@ -5,6 +5,7 @@
  */
 
 import { saveWeatherData, getWeatherHistory } from './database'
+import { getLocation } from './locationService'
 
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY
 const BASE_URL = 'https://api.openweathermap.org/data/2.5'
@@ -14,40 +15,10 @@ const cache = new Map()
 const CACHE_DURATION = 10 * 60 * 1000 // 10 minutes
 
 /**
- * Get user's current location
+ * Get user's current location (uses centralized location service)
  */
 export async function getCurrentLocation() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Geolocation not supported'))
-      return
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
-          accuracy: position.coords.accuracy
-        })
-      },
-      (error) => {
-        console.error('Geolocation error:', error)
-        // Default to Pune, Maharashtra if location fails
-        resolve({
-          lat: 18.5204,
-          lon: 73.8567,
-          isDefault: true,
-          city: 'पुणे'
-        })
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000 // 5 minutes
-      }
-    )
-  })
+  return getLocation()
 }
 
 /**
