@@ -104,10 +104,10 @@ function WeatherPage({ selectedCrop }) {
 
   const getInsightBg = (type) => {
     switch (type) {
-      case 'danger': return 'bg-red-50 border-red-200'
-      case 'warning': return 'bg-orange-50 border-orange-200'
-      case 'success': return 'bg-green-50 border-green-200'
-      default: return 'bg-blue-50 border-blue-200'
+      case 'danger': return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+      case 'warning': return 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+      case 'success': return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+      default: return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
     }
   }
 
@@ -115,13 +115,13 @@ function WeatherPage({ selectedCrop }) {
     return (
       <div className="page-container items-center justify-center">
         <Loader2 className="animate-spin text-primary-600" size={48} />
-        <p className="mt-4 text-gray-600">हवामान माहिती लोड होत आहे...</p>
+        <p className="mt-4 text-gray-600 dark:text-gray-300">हवामान माहिती लोड होत आहे...</p>
       </div>
     )
   }
 
   return (
-    <div className="page-container bg-gradient-to-b from-blue-50 to-white">
+    <div className="page-container bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <header className="header bg-gradient-to-r from-blue-600 to-blue-700">
         <div className="flex items-center gap-3">
@@ -146,13 +146,13 @@ function WeatherPage({ selectedCrop }) {
 
       {/* Error Banner */}
       {error && (
-        <div className="bg-red-100 text-red-700 p-3 text-sm">
+        <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 p-3 text-sm">
           {error}
         </div>
       )}
 
       {/* Tab Navigation */}
-      <div className="flex bg-white border-b sticky top-14 z-10">
+      <div className="flex bg-white dark:bg-gray-800 border-b dark:border-gray-700 sticky top-14 z-10">
         {[
           { id: 'current', label: 'आत्ता', labelEn: 'Now' },
           { id: 'forecast', label: 'अंदाज', labelEn: 'Forecast' },
@@ -164,8 +164,8 @@ function WeatherPage({ selectedCrop }) {
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
               activeTab === tab.id 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-500'
+                ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' 
+                : 'text-gray-500 dark:text-gray-400'
             }`}
           >
             {tab.label}
@@ -204,43 +204,43 @@ function WeatherPage({ selectedCrop }) {
             {/* Weather Details */}
             <div className="grid grid-cols-2 gap-3">
               <div className="card flex items-center gap-3">
-                <div className="bg-blue-100 p-2 rounded-lg">
-                  <Droplets className="text-blue-600" size={24} />
+                <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg">
+                  <Droplets className="text-blue-600 dark:text-blue-400" size={24} />
                 </div>
                 <div>
-                  <p className="text-gray-500 text-xs">आर्द्रता</p>
-                  <p className="text-lg font-semibold">{currentWeather.humidity}%</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">आर्द्रता</p>
+                  <p className="text-lg font-semibold dark:text-white">{currentWeather.humidity}%</p>
                 </div>
               </div>
               
               <div className="card flex items-center gap-3">
-                <div className="bg-green-100 p-2 rounded-lg">
-                  <Wind className="text-green-600" size={24} />
+                <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg">
+                  <Wind className="text-green-600 dark:text-green-400" size={24} />
                 </div>
                 <div>
-                  <p className="text-gray-500 text-xs">वारा</p>
-                  <p className="text-lg font-semibold">{currentWeather.windSpeed} m/s</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">वारा</p>
+                  <p className="text-lg font-semibold dark:text-white">{currentWeather.windSpeed} m/s</p>
                   <p className="text-xs text-gray-400">{getWindDirection(currentWeather.windDeg).mr}</p>
                 </div>
               </div>
               
               <div className="card flex items-center gap-3">
-                <div className="bg-orange-100 p-2 rounded-lg">
-                  <Thermometer className="text-orange-600" size={24} />
+                <div className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg">
+                  <Thermometer className="text-orange-600 dark:text-orange-400" size={24} />
                 </div>
                 <div>
-                  <p className="text-gray-500 text-xs">जाणवणारे</p>
-                  <p className="text-lg font-semibold">{currentWeather.feelsLike}°C</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">जाणवणारे</p>
+                  <p className="text-lg font-semibold dark:text-white">{currentWeather.feelsLike}°C</p>
                 </div>
               </div>
               
               <div className="card flex items-center gap-3">
-                <div className="bg-purple-100 p-2 rounded-lg">
-                  <Cloud className="text-purple-600" size={24} />
+                <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg">
+                  <Cloud className="text-purple-600 dark:text-purple-400" size={24} />
                 </div>
                 <div>
-                  <p className="text-gray-500 text-xs">ढग</p>
-                  <p className="text-lg font-semibold">{currentWeather.clouds}%</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">ढग</p>
+                  <p className="text-lg font-semibold dark:text-white">{currentWeather.clouds}%</p>
                 </div>
               </div>
             </div>
@@ -249,15 +249,15 @@ function WeatherPage({ selectedCrop }) {
             <div className="card flex justify-around">
               <div className="text-center">
                 <Sun className="text-orange-400 mx-auto" size={24} />
-                <p className="text-xs text-gray-500 mt-1">सूर्योदय</p>
-                <p className="font-semibold">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">सूर्योदय</p>
+                <p className="font-semibold dark:text-white">
                   {currentWeather.sunrise.toLocaleTimeString('mr-IN', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
               <div className="text-center">
                 <Cloud className="text-gray-400 mx-auto" size={24} />
-                <p className="text-xs text-gray-500 mt-1">सूर्यास्त</p>
-                <p className="font-semibold">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">सूर्यास्त</p>
+                <p className="font-semibold dark:text-white">
                   {currentWeather.sunset.toLocaleTimeString('mr-IN', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
@@ -271,10 +271,10 @@ function WeatherPage({ selectedCrop }) {
             {/* API Forecast */}
             {forecast?.daily && (
               <div className="card">
-                <h3 className="font-semibold mb-3">5 दिवसांचा अंदाज (OpenWeather)</h3>
+                <h3 className="font-semibold mb-3 dark:text-white">5 दिवसांचा अंदाज (OpenWeather)</h3>
                 <div className="space-y-3">
                   {forecast.daily.map((day, idx) => (
-                    <div key={idx} className="flex items-center justify-between py-2 border-b last:border-0">
+                    <div key={idx} className="flex items-center justify-between py-2 border-b dark:border-gray-700 last:border-0">
                       <div className="flex items-center gap-3">
                         <img 
                           src={getWeatherIconUrl(day.icon)} 
@@ -282,12 +282,12 @@ function WeatherPage({ selectedCrop }) {
                           className="w-10 h-10"
                         />
                         <div>
-                          <p className="font-medium">{day.dayName}</p>
-                          <p className="text-xs text-gray-500">{getConditionMarathi(day.condition)}</p>
+                          <p className="font-medium dark:text-white">{day.dayName}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{getConditionMarathi(day.condition)}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">{day.tempMax}° / {day.tempMin}°</p>
+                        <p className="font-semibold dark:text-white">{day.tempMax}° / {day.tempMin}°</p>
                         {day.pop > 0 && (
                           <p className="text-xs text-blue-500">💧 {Math.round(day.pop * 100)}%</p>
                         )}
@@ -300,9 +300,9 @@ function WeatherPage({ selectedCrop }) {
 
             {/* ML Predictions */}
             {prediction?.predictions && (
-              <div className="card bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+              <div className="card bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-800">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-purple-800">🤖 AI अंदाज (7 दिवस)</h3>
+                  <h3 className="font-semibold text-purple-800 dark:text-purple-300">🤖 AI अंदाज (7 दिवस)</h3>
                   <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
                     ML Model
                   </span>
@@ -363,9 +363,9 @@ function WeatherPage({ selectedCrop }) {
             )}
 
             {!prediction && (
-              <div className="card bg-gray-50 text-center py-8">
+              <div className="card bg-gray-50 dark:bg-gray-800 text-center py-8">
                 <Info className="text-gray-400 mx-auto mb-2" size={32} />
-                <p className="text-gray-600">अंदाज तयार करण्यासाठी अधिक डेटा आवश्यक आहे</p>
+                <p className="text-gray-600 dark:text-gray-300">अंदाज तयार करण्यासाठी अधिक डेटा आवश्यक आहे</p>
                 <p className="text-xs text-gray-400 mt-1">दररोज अॅप वापरा - 5+ दिवसांनंतर AI अंदाज उपलब्ध होतील</p>
               </div>
             )}
@@ -397,7 +397,7 @@ function WeatherPage({ selectedCrop }) {
             </div>
 
             {/* Farming Insights */}
-            <h3 className="font-semibold text-gray-700">🌾 शेती सल्ला</h3>
+            <h3 className="font-semibold text-gray-700 dark:text-gray-200">🌾 शेती सल्ला</h3>
             {insights.map((insight, idx) => (
               <div key={idx} className={`card border ${getInsightBg(insight.type)}`}>
                 <div className="flex items-start gap-3">
@@ -424,18 +424,18 @@ function WeatherPage({ selectedCrop }) {
         {activeTab === 'history' && (
           <>
             <div className="card">
-              <h3 className="font-semibold mb-2">📊 संकलित हवामान डेटा</h3>
-              <p className="text-sm text-gray-500 mb-4">
+              <h3 className="font-semibold mb-2 dark:text-white">📊 संकलित हवामान डेटा</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 गेल्या 30 दिवसांतील {history.length} रेकॉर्ड्स
               </p>
 
               {history.length > 0 ? (
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {history.slice().reverse().map((day, idx) => (
-                    <div key={idx} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                    <div key={idx} className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                       <div>
-                        <p className="font-medium text-sm">{day.date}</p>
-                        <p className="text-xs text-gray-500">{day.dominantCondition || 'N/A'}</p>
+                        <p className="font-medium text-sm dark:text-white">{day.date}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{day.dominantCondition || 'N/A'}</p>
                       </div>
                       <div className="flex gap-4 text-sm">
                         <div className="text-center">
@@ -451,7 +451,7 @@ function WeatherPage({ selectedCrop }) {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <Cloud className="mx-auto mb-2 opacity-50" size={48} />
                   <p>अद्याप कोणताही डेटा नाही</p>
                   <p className="text-xs mt-1">अॅप वापरत राहा - डेटा स्वयंचलितपणे संकलित होतो</p>
@@ -462,25 +462,25 @@ function WeatherPage({ selectedCrop }) {
             {/* Stats Summary */}
             {history.length > 0 && (
               <div className="card">
-                <h4 className="font-semibold mb-3">📈 सारांश</h4>
+                <h4 className="font-semibold mb-3 dark:text-white">📈 सारांश</h4>
                 <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="bg-orange-50 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-orange-600">
+                  <div className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-3">
+                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                       {Math.round(history.reduce((a, h) => a + h.avgTemp, 0) / history.length)}°
                     </p>
-                    <p className="text-xs text-gray-500">सरासरी तापमान</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">सरासरी तापमान</p>
                   </div>
-                  <div className="bg-blue-50 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-blue-600">
+                  <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {Math.round(history.reduce((a, h) => a + h.avgHumidity, 0) / history.length)}%
                     </p>
-                    <p className="text-xs text-gray-500">सरासरी आर्द्रता</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">सरासरी आर्द्रता</p>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-green-600">
+                  <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-3">
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                       {history.length}
                     </p>
-                    <p className="text-xs text-gray-500">दिवसांचा डेटा</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">दिवसांचा डेटा</p>
                   </div>
                 </div>
               </div>
