@@ -4,6 +4,7 @@ import { Camera, Upload, X, RotateCcw, Zap, ArrowLeft } from 'lucide-react'
 import { classifyImage } from '../lib/classifier'
 import { saveScan } from '../lib/database'
 import { saveTrainingImage } from '../lib/trainingService'
+import { uploadScanImage, saveTrainingImageToBlob } from '../lib/blobService'
 
 function ScanPage({ selectedCrop, setScanResult }) {
   const navigate = useNavigate()
@@ -123,7 +124,7 @@ function ScanPage({ selectedCrop, setScanResult }) {
       // Save to database using new service
       await saveScan(scanData)
 
-      // Automatically save image for training
+      // Automatically save image for training (local IndexedDB)
       await saveTrainingImage({
         image: capturedImage,
         crop: selectedCrop,
@@ -133,6 +134,14 @@ function ScanPage({ selectedCrop, setScanResult }) {
         verified: false,
         source: 'scan'
       })
+
+      // Save to Vercel Blob (cloud storage)
+      uploadScanImage(capturedImage, {
+        crop: selectedCrop,
+        disease: result.disease,
+        confidence: result.confidence
+      })
+      saveTrainingImageToBlob(capturedImage, result.disease, selectedCrop)
 
       navigate('/results')
     } catch (err) {

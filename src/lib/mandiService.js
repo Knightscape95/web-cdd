@@ -5,6 +5,7 @@
  */
 
 import { getLocation } from './locationService'
+import { saveMandiToBlob } from './blobService'
 
 const API_KEY = import.meta.env.VITE_DATAGOV_API_KEY
 const BASE_URL = 'https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070'
@@ -63,6 +64,10 @@ export async function getMandiPrices(commodity = 'soybean') {
     }
 
     cache.set(cacheKey, { data: result, timestamp: Date.now() })
+    
+    // Save to Vercel Blob (async, non-blocking)
+    saveMandiToBlob(result)
+    
     return result
 
   } catch (err) {
