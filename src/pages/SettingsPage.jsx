@@ -159,7 +159,7 @@ function SettingsPage() {
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
                 <img 
-                  src="/developer.jpeg" 
+                  src="/download.jpeg" 
                   alt="Developer" 
                   className="w-8 h-8 rounded-full border-2 border-primary-500"
                 />
