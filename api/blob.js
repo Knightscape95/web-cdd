@@ -1,95 +1,73 @@
 import { put, list, del } from '@vercel/blob';
 
-export const config = {
-  runtime: 'edge',
-};
-
-export default async function handler(request) {
-  const { searchParams } = new URL(request.url);
-  const action = searchParams.get('action');
+export default async function handler(req, res) {
+  const { action } = req.query;
 
   try {
     // Upload image
-    if (request.method === 'POST' && action === 'upload') {
-      const formData = await request.formData();
-      const file = formData.get('file');
-      const folder = formData.get('folder') || 'scans';
-      const metadata = formData.get('metadata');
+    if (req.method === 'POST' && action === 'upload') {
+      const { file, folder = 'scans', metadata } = req.body;
 
       if (!file) {
-        return new Response(JSON.stringify({ error: 'No file provided' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(400).json({ error: 'No file provided' });
       }
 
-      const filename = `${folder}/${Date.now()}_${file.name}`;
-      const blob = await put(filename, file, {
+      // Convert base64 to buffer
+      const base64Data = file.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      const filename = `${folder}/${Date.now()}.jpg`;
+      const blob = await put(filename, buffer, {
         access: 'public',
-        addRandomSuffix: false,
+        contentType: 'image/jpeg',
       });
 
-      return new Response(JSON.stringify({
+      return res.status(200).json({
         success: true,
         url: blob.url,
         pathname: blob.pathname,
-        metadata: metadata ? JSON.parse(metadata) : null
-      }), {
-        headers: { 'Content-Type': 'application/json' },
+        metadata: metadata || null
       });
     }
 
     // Save JSON data (weather, mandi prices)
-    if (request.method === 'POST' && action === 'save-data') {
-      const body = await request.json();
-      const { type, data } = body;
+    if (req.method === 'POST' && action === 'save-data') {
+      const { type, data } = req.body;
 
       const filename = `data/${type}/${Date.now()}.json`;
       const blob = await put(filename, JSON.stringify(data), {
         access: 'public',
-        addRandomSuffix: false,
         contentType: 'application/json',
       });
 
-      return new Response(JSON.stringify({
+      return res.status(200).json({
         success: true,
         url: blob.url,
         pathname: blob.pathname
-      }), {
-        headers: { 'Content-Type': 'application/json' },
       });
     }
 
     // List blobs
-    if (request.method === 'GET' && action === 'list') {
-      const prefix = searchParams.get('prefix') || '';
+    if (req.method === 'GET' && action === 'list') {
+      const { prefix = '' } = req.query;
       const { blobs } = await list({ prefix });
 
-      return new Response(JSON.stringify({ blobs }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return res.status(200).json({ blobs });
     }
 
     // Delete blob
-    if (request.method === 'DELETE') {
-      const url = searchParams.get('url');
+    if (req.method === 'DELETE') {
+      const { url } = req.query;
       if (url) {
         await del(url);
-        return new Response(JSON.stringify({ success: true }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(200).json({ success: true });
       }
     }
 
-    return new Response(JSON.stringify({ error: 'Invalid action' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(400).json({ error: 'Invalid action' });
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    console.error('Blob API error:', error);
+    return res.status(500).json({ error: error.message });
   }
 }

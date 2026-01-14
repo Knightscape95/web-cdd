@@ -10,18 +10,14 @@ const API_URL = '/api/blob';
  */
 export async function uploadScanImage(imageBase64, metadata = {}) {
   try {
-    // Convert base64 to blob
-    const response = await fetch(imageBase64);
-    const blob = await response.blob();
-    
-    const formData = new FormData();
-    formData.append('file', blob, `scan_${Date.now()}.jpg`);
-    formData.append('folder', 'scans');
-    formData.append('metadata', JSON.stringify(metadata));
-
     const result = await fetch(`${API_URL}?action=upload`, {
       method: 'POST',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        file: imageBase64,
+        folder: 'scans',
+        metadata
+      }),
     });
 
     if (!result.ok) throw new Error('Upload failed');
@@ -90,17 +86,14 @@ export async function saveMandiToBlob(mandiData) {
  */
 export async function saveTrainingImageToBlob(imageBase64, label, crop) {
   try {
-    const response = await fetch(imageBase64);
-    const blob = await response.blob();
-    
-    const formData = new FormData();
-    formData.append('file', blob, `${crop}_${label}_${Date.now()}.jpg`);
-    formData.append('folder', `training/${crop}/${label.replace(/\s+/g, '_')}`);
-    formData.append('metadata', JSON.stringify({ label, crop, timestamp: new Date().toISOString() }));
-
     const result = await fetch(`${API_URL}?action=upload`, {
       method: 'POST',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        file: imageBase64,
+        folder: `training/${crop}/${label.replace(/\s+/g, '_')}`,
+        metadata: { label, crop, timestamp: new Date().toISOString() }
+      }),
     });
 
     if (!result.ok) throw new Error('Upload failed');
