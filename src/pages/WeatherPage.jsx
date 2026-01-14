@@ -376,19 +376,19 @@ function WeatherPage({ selectedCrop }) {
         {activeTab === 'insights' && (
           <>
             {/* Crop Calendar */}
-            <div className="card bg-green-50 border-green-200">
+            <div className="card bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2 mb-3">
-                <Calendar className="text-green-600" size={20} />
-                <h3 className="font-semibold text-green-800">
+                <Calendar className="text-green-600 dark:text-green-400" size={20} />
+                <h3 className="font-semibold text-green-800 dark:text-green-300">
                   {cropNames[selectedCrop]?.mr} पीक कॅलेंडर
                 </h3>
               </div>
-              <div className="bg-white rounded-lg p-3">
-                <p className="font-medium text-lg">{cropCalendar.stage}</p>
-                <p className="text-sm text-gray-500">{cropCalendar.en}</p>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
+                <p className="font-medium text-lg dark:text-white">{cropCalendar.stage}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{cropCalendar.en}</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {cropCalendar.activities.map((activity, idx) => (
-                    <span key={idx} className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                    <span key={idx} className="bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-300 px-2 py-1 rounded text-xs">
                       {activity}
                     </span>
                   ))}
@@ -403,12 +403,12 @@ function WeatherPage({ selectedCrop }) {
                 <div className="flex items-start gap-3">
                   {getInsightIcon(insight.type)}
                   <div className="flex-1">
-                    <h4 className="font-semibold">{insight.titleMr}</h4>
-                    <p className="text-xs text-gray-500">{insight.titleEn}</p>
-                    <p className="text-sm mt-2">{insight.messageMr}</p>
+                    <h4 className="font-semibold dark:text-white">{insight.titleMr}</h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{insight.titleEn}</p>
+                    <p className="text-sm mt-2 dark:text-gray-200">{insight.messageMr}</p>
                     {insight.action && (
-                      <div className="mt-2 bg-white/50 rounded p-2">
-                        <p className="text-xs text-gray-600">
+                      <div className="mt-2 bg-white/50 dark:bg-gray-700/50 rounded p-2">
+                        <p className="text-xs text-gray-600 dark:text-gray-300">
                           <strong>कृती:</strong> {insight.action}
                         </p>
                       </div>
