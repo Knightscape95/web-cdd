@@ -17,12 +17,12 @@ const CACHE_DURATION = 30 * 60 * 1000
 /**
  * Get mandi prices for user's location
  */
-export async function getMandiPrices(commodity = 'soybean') {
+export async function getMandiPrices(commodity = 'soybean', forceRefresh = false) {
   const location = await getLocation()
   const cacheKey = `mandi_${commodity}_${location.district}`
   const cached = cache.get(cacheKey)
 
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+  if (!forceRefresh && cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return { ...cached.data, location }
   }
 
@@ -79,10 +79,10 @@ export async function getMandiPrices(commodity = 'soybean') {
 /**
  * Get prices for both crops
  */
-export async function getAllPrices() {
+export async function getAllPrices(forceRefresh = false) {
   const [soybean, cotton] = await Promise.all([
-    getMandiPrices('soybean'),
-    getMandiPrices('cotton')
+    getMandiPrices('soybean', forceRefresh),
+    getMandiPrices('cotton', forceRefresh)
   ])
   return { soybean, cotton, location: soybean.location }
 }
@@ -98,6 +98,7 @@ function getFallbackPrices(commodity, location) {
     commodity: 'Cotton',
     prices: [
       { district, market: district, variety: 'Hybrid', minPrice: 6800, maxPrice: 7500, modalPrice: 7200, date: today },
+      { district: 'Wardha', market: 'Hinganghat', variety: 'Hybrid', minPrice: 6900, maxPrice: 7600, modalPrice: 7300, date: today },
       { district: 'Amravati', market: 'Amravati', variety: 'Hybrid', minPrice: 6700, maxPrice: 7400, modalPrice: 7100, date: today },
       { district: 'Nagpur', market: 'Nagpur', variety: 'Desi', minPrice: 6750, maxPrice: 7450, modalPrice: 7150, date: today }
     ]
@@ -105,6 +106,7 @@ function getFallbackPrices(commodity, location) {
     commodity: 'Soyabean',
     prices: [
       { district, market: district, variety: 'Yellow', minPrice: 4500, maxPrice: 5200, modalPrice: 4850, date: today },
+      { district: 'Wardha', market: 'Hinganghat', variety: 'Yellow', minPrice: 4600, maxPrice: 5300, modalPrice: 4950, date: today },
       { district: 'Latur', market: 'Latur', variety: 'Yellow', minPrice: 4400, maxPrice: 5100, modalPrice: 4750, date: today },
       { district: 'Akola', market: 'Akola', variety: 'Yellow', minPrice: 4450, maxPrice: 5150, modalPrice: 4800, date: today }
     ]

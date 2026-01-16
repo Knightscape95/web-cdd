@@ -15,11 +15,11 @@ function MandiPage() {
     fetchPrices()
   }, [])
 
-  const fetchPrices = async () => {
+  const fetchPrices = async (force = false) => {
     try {
-      setLoading(true)
+      if (!force) setLoading(true)
       setError(null)
-      const data = await getAllPrices()
+      const data = await getAllPrices(force)
       setPriceData(data)
     } catch (err) {
       console.error('Failed to fetch mandi prices:', err)
@@ -31,7 +31,7 @@ function MandiPage() {
 
   const handleRefresh = async () => {
     setRefreshing(true)
-    await fetchPrices()
+    await fetchPrices(true)
     setRefreshing(false)
   }
 
