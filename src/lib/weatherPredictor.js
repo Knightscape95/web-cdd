@@ -5,6 +5,7 @@
  */
 
 import { getDailyWeatherStats, saveWeatherPrediction, getLatestPrediction } from './database'
+import { predictWithLstm, isLstmModelAvailable } from './weatherLstm'
 
 /**
  * Linear Regression for trend prediction
@@ -108,6 +109,51 @@ export async function predictWeather(lat, lon, daysAhead = 7) {
   // Get historical data (last 30 days)
   const history = await getDailyWeatherStats(lat, lon, 30)
   
+  // Try ML LSTM prediction if model is available and we have enough history
+  try {
+    if ((await isLstmModelAvailable()) && history.length >= 14) {
+      const mlPreds = await predictWithLstm(history, daysAhead)
+      if (mlPreds && mlPreds.length >= daysAhead) {
+        const mlPredictions = []
+        const today = new Date()
+        for (let i = 1; i <= daysAhead; i++) {
+          const futureDate = new Date(today)
+          futureDate.setDate(futureDate.getDate() + i)
+          const p = mlPreds[i - 1]
+          const predMonth = futureDate.getMonth() + 1
+          const condition = estimateCondition(p.temp, p.humidity, predMonth)
+          const confidence = Math.max(0.4, 0.9 - (i * 0.04))
+
+          mlPredictions.push({
+            date: futureDate.toISOString().split('T')[0],
+            dayName: getDayName(futureDate),
+            temp: p.temp,
+            tempMin: p.temp - 1,
+            tempMax: p.temp + 1,
+            humidity: p.humidity,
+            pressure: p.pressure,
+            condition,
+            confidence,
+            isMLPrediction: true
+          })
+        }
+
+        const prediction = {
+          lat,
+          lon,
+          predictions: mlPredictions,
+          trends: {},
+          modelInfo: { model: 'weather_lstm', dataPoints: history.length }
+        }
+
+        await saveWeatherPrediction(prediction)
+        return prediction
+      }
+    }
+  } catch (err) {
+    console.warn('LSTM attempt failed, falling back to statistical method', err)
+  }
+
   if (history.length < 5) {
     // Not enough data - return null (will use API forecast only)
     return null
