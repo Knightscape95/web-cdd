@@ -2,8 +2,14 @@ import React, { useMemo } from 'react'
 import { getWeatherIconUrl } from '../lib/weatherService'
 
 function formatHour(dateStrOrObj) {
-  const d = typeof dateStrOrObj === 'string' ? new Date(dateStrOrObj) : dateStrOrObj
-  return d.toLocaleTimeString('mr-IN', { hour: '2-digit', minute: '2-digit' })
+  // Support UNIX timestamp (seconds), ISO string, or Date object
+  const d = typeof dateStrOrObj === 'number'
+    ? new Date(dateStrOrObj * 1000)
+    : (typeof dateStrOrObj === 'string' ? new Date(dateStrOrObj) : dateStrOrObj)
+
+  return (d && typeof d.toLocaleTimeString === 'function')
+    ? d.toLocaleTimeString('mr-IN', { hour: '2-digit', minute: '2-digit' })
+    : ''
 }
 
 function Sparkline({ values = [], width = 200, height = 40, stroke = '#3b82f6' }) {
@@ -33,8 +39,24 @@ function Sparkline({ values = [], width = 200, height = 40, stroke = '#3b82f6' }
 }
 
 export default function HourlyTimeline({ hourly = [] }) {
-  // Take up to next 24 hours — data may be 3-hourly points
-  const items = hourly.slice(0, 8) // 8 * 3h = 24h if 3-hourly; otherwise first 24
+  // Select entries that fall within the next 24 hours from the first timestamp.
+  // This handles both 1-hourly and 3-hourly datasets by using a time cutoff instead of a fixed count.
+  let items = []
+  if (Array.isArray(hourly) && hourly.length > 0) {
+    const first = hourly[0]
+    const firstMs = typeof first.dt === 'number' ? first.dt * 1000 : new Date(first.dt).getTime()
+    const cutoff = firstMs + 24 * 60 * 60 * 1000
+
+    items = hourly.filter(i => {
+      const t = typeof i.dt === 'number' ? i.dt * 1000 : new Date(i.dt).getTime()
+      return t <= cutoff
+    })
+
+    // Fallback to a small slice if timestamps are missing or filter returned nothing
+    if (items.length === 0) items = hourly.slice(0, 8)
+  } else {
+    items = []
+  }
 
   const temps = useMemo(() => items.map(i => i.temp), [items])
 
@@ -53,7 +75,7 @@ export default function HourlyTimeline({ hourly = [] }) {
               <div className="text-xs text-gray-500">{formatHour(it.dt)}</div>
               <img src={getWeatherIconUrl(it.icon)} alt={it.condition} className="mx-auto w-8 h-8" />
               <div className="text-sm font-semibold">{Math.round(it.temp)}°C</div>
-              <div className="text-xs text-gray-500">{it.pop ? `${Math.round(it.pop * 100)}%` : '-'}</div>
+              <div className="text-xs text-gray-500">{it.pop != null ? `${Math.round(it.pop * 100)}%` : '-'}</div>
             </div>
           ))}
 

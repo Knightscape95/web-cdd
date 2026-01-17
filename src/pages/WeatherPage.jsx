@@ -20,6 +20,13 @@ import LocationSearch from '../components/LocationSearch'
 import FavoritesList from '../components/FavoritesList'
 import AdvancedMetrics from '../components/AdvancedMetrics'
 import HourlyTimeline from '../components/HourlyTimeline'
+import MapContainer from '../components/MapContainer'
+import WeatherTimeline from '../components/WeatherTimeline'
+import LayerControls from '../components/LayerControls'
+import SearchBox from '../components/SearchBox'
+import ColorLegend from '../components/ColorLegend'
+import MapViewSwitcher from '../components/MapViewSwitcher'
+import MiniTempBar from '../components/MiniTempBar'
 
 function WeatherPage({ selectedCrop }) {
   const navigate = useNavigate()
@@ -88,6 +95,12 @@ function WeatherPage({ selectedCrop }) {
 
   const currentMonth = new Date().getMonth() + 1
   const cropCalendar = getCropCalendar(selectedCrop, currentMonth)
+
+  // Forecast temperature bounds used by mini temp bars for comparison
+  const forecastTempMins = forecast?.daily?.map(d => Number(d.tempMin ?? d.minTemp ?? d.temp ?? 0)) || []
+  const forecastTempMaxs = forecast?.daily?.map(d => Number(d.tempMax ?? d.maxTemp ?? d.temp ?? 0)) || []
+  const overallTempMin = forecastTempMins.length ? Math.min(...forecastTempMins) : 0
+  const overallTempMax = forecastTempMaxs.length ? Math.max(...forecastTempMaxs) : overallTempMin + 10
 
   const getTrendIcon = (trend) => {
     switch (trend) {
@@ -326,6 +339,25 @@ function WeatherPage({ selectedCrop }) {
                 </p>
               </div>
             </div>
+
+            {/* Map - large */}
+            <div className="card relative">
+              <div className="flex items-start justify-between mb-2">
+                <h4 className="font-semibold">नकाशा (Map)</h4>
+                <div className="text-xs text-gray-500">Tip: Click the full-screen icon on the map to expand for detailed overlays</div>
+              </div>
+
+              {/* Top-left search and top-right view switcher */}
+              <SearchBox onLocationSelect={(loc) => handleLocationSelect({ lat: loc.lat, lon: loc.lng })} onCurrentLocation={() => { /* handled by map locate */ }} />
+              <MapViewSwitcher activeView={activeLayer === 'satellite' ? 'satellite' : 'street'} onChange={(v) => setActiveLayer(v === 'satellite' ? 'satellite' : 'street')} />
+
+              <MapContainer center={[location?.lat || 21.1458, location?.lon || 79.0882]} zoom={9} className="h-[70vh] w-full" />
+
+              <LayerControls activeLayer={activeLayer} onChange={(id) => setActiveLayer(id)} />
+              <ColorLegend activeLayer={activeLayer} />
+
+              <p className="text-xs text-gray-500 mt-2">Use the layer controls on the map (top-right) to switch base layers and toggle weather overlays. RainViewer radar doesn't require a key; OpenWeather overlays (precipitation, temperature, wind, clouds) require <code>VITE_WEATHER_API_KEY</code> to be configured in your environment.</p>
+            </div>
           </>
         )}
 
@@ -359,6 +391,10 @@ function WeatherPage({ selectedCrop }) {
                       <div className="text-right flex items-center gap-3">
                         <div className="text-sm font-semibold dark:text-white">{day.tempMax}°</div>
                         <div className="text-xs text-gray-500">{day.tempMin}°</div>
+
+                        {/* Mini temp bar for quick visual comparison */}
+                        <MiniTempBar min={Number(day.tempMin)} max={Number(day.tempMax)} overallMin={overallTempMin} overallMax={overallTempMax} />
+
                         <div className="ml-2 inline-flex items-center gap-1">
                           <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">💧 {Math.round((day.pop || 0) * 100)}%</span>
                         </div>

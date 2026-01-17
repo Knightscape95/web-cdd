@@ -53,8 +53,29 @@ const MapOverlaysControl = ({ overlays, onToggle, opacities, onOpacityChange, di
           <OpacitySlider id="opacity-temp" value={opacities.temperature} onChange={(v) => onOpacityChange('temperature', v)} disabled={disabled || !overlays.temperature} />
         </div>
 
+        <div className="flex items-center justify-between gap-3">
+          <OverlayToggle id="overlay-clouds" label="ढग (Clouds)" checked={overlays.clouds} onChange={(v) => onToggle('clouds', v)} disabled={disabled} />
+          <OpacitySlider id="opacity-clouds" value={opacities.clouds} onChange={(v) => onOpacityChange('clouds', v)} disabled={disabled || !overlays.clouds} />
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <OverlayToggle id="overlay-rainviewer" label="RainViewer (Radar)" checked={overlays.rainviewer} onChange={(v) => onToggle('rainviewer', v)} disabled={false} />
+          <OpacitySlider id="opacity-rainviewer" value={opacities.rainviewer} onChange={(v) => onOpacityChange('rainviewer', v)} disabled={!overlays.rainviewer} />
+        </div>
+
+        <div className="mt-2 pt-2 border-t text-xs text-gray-600">
+          <h5 className="text-xs font-semibold mb-1">Legend</h5>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-blue-400 rounded-sm inline-block" aria-hidden></span><span>पाऊस — Precipitation intensity</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-cyan-400 rounded-sm inline-block" aria-hidden></span><span>वारा — Wind (speed)</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-red-400 rounded-sm inline-block" aria-hidden></span><span>तापमान — Temperature heatmap</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-gray-400 rounded-sm inline-block" aria-hidden></span><span>ढग — Cloud cover</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-indigo-500 rounded-sm inline-block" aria-hidden></span><span>RainViewer — Radar (near-real-time)</span></div>
+          </div>
+        </div>
+
         {disabled && (
-          <p className="text-xs text-gray-500 mt-1">OpenWeather API key not configured. Set <code>VITE_WEATHER_API_KEY</code> to enable overlays.</p>
+          <p className="text-xs text-gray-500 mt-1">OpenWeather API key not configured. Set <code>VITE_WEATHER_API_KEY</code> to enable OpenWeather overlays (precipitation, temperature, wind, clouds).</p>
         )}
       </div>
     </div>

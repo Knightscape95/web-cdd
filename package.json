@@ -10,12 +10,20 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.26.2",
+    "idb": "^8.0.0",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.344.0",
     "onnxruntime-web": "^1.17.0",
+    "rc-slider": "^11.1.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
+    "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.22.0",
-    "lucide-react": "^0.344.0",
-    "idb": "^8.0.0"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",

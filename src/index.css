@@ -148,3 +148,17 @@ body {
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
   }
 }
+
+/* Fullscreen map */
+.map-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 60 !important;
+  padding: 1rem !important;
+  background: rgba(255,255,255,0.96);
+}
+
+.map-fullscreen .leaflet-container {
+  height: calc(100vh - 2rem) !important;
+}
+
