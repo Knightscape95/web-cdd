@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   ArrowLeft, MapPin, RefreshCw, Thermometer, Droplets, Wind, 
   Cloud, Sun, CloudRain, ChevronRight, TrendingUp, TrendingDown,
-  AlertTriangle, CheckCircle, Info, Calendar, Loader2
+  AlertTriangle, CheckCircle, Info, Calendar, Loader2, Search
 } from 'lucide-react'
 import { 
   getCurrentLocation, 
@@ -16,6 +16,10 @@ import {
 } from '../lib/weatherService'
 import { predictWeather, getFarmingInsights, getCropCalendar } from '../lib/weatherPredictor'
 import { getWeatherHistory, getDailyWeatherStats } from '../lib/database'
+import LocationSearch from '../components/LocationSearch'
+import FavoritesList from '../components/FavoritesList'
+import AdvancedMetrics from '../components/AdvancedMetrics'
+import HourlyTimeline from '../components/HourlyTimeline'
 
 function WeatherPage({ selectedCrop }) {
   const navigate = useNavigate()
@@ -93,6 +97,41 @@ function WeatherPage({ selectedCrop }) {
     }
   }
 
+  // Location search state
+  const [showLocationPanel, setShowLocationPanel] = useState(false)
+
+  const handleLocationSelect = async (loc) => {
+    // center on selected location and fetch weather for it
+    try {
+      setLoading(true)
+      setError(null)
+      setLocation({ lat: loc.lat, lon: loc.lon, city: loc.name })
+
+      const [weather, forecastData, locName] = await Promise.all([
+        getCurrentWeather(loc.lat, loc.lon),
+        getForecast(loc.lat, loc.lon),
+        getLocationName(loc.lat, loc.lon)
+      ])
+
+      setCurrentWeather(weather)
+      setForecast(forecastData)
+      setLocationName(locName)
+
+      const pred = await predictWeather(loc.lat, loc.lon, 7)
+      setPrediction(pred)
+      const farmInsights = getFarmingInsights(pred?.predictions || forecastData?.daily || [], selectedCrop)
+      setInsights(farmInsights)
+
+      setShowLocationPanel(false)
+    } catch (err) {
+      console.error('Location select error', err)
+      setError('ठिकाण निवडताना त्रुटी')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+
   const getInsightIcon = (type) => {
     switch (type) {
       case 'danger': return <AlertTriangle className="text-red-500" size={20} />
@@ -136,12 +175,25 @@ function WeatherPage({ selectedCrop }) {
             </div>
           </div>
         </div>
-        <button 
-          onClick={fetchWeatherData}
-          className="p-2 hover:bg-white/10 rounded-full"
-        >
-          <RefreshCw size={20} />
-        </button>
+
+        {/* Location search & favorites */}
+        <div className="ml-auto flex items-center gap-3">
+          <button
+            className="p-2 hover:bg-white/10 rounded-full"
+            onClick={() => setShowLocationPanel(prev => !prev)}
+            aria-expanded={showLocationPanel}
+            title="Search locations"
+          >
+            <Search size={18} />
+          </button>
+
+          <button 
+            onClick={fetchWeatherData}
+            className="p-2 hover:bg-white/10 rounded-full"
+          >
+            <RefreshCw size={20} />
+          </button>
+        </div>
       </header>
 
       {/* Error Banner */}
@@ -157,6 +209,7 @@ function WeatherPage({ selectedCrop }) {
           { id: 'current', label: 'आत्ता', labelEn: 'Now' },
           { id: 'forecast', label: 'अंदाज', labelEn: 'Forecast' },
           { id: 'insights', label: 'सल्ला', labelEn: 'Insights' },
+          { id: 'advanced', label: 'पुढील मोजमाप', labelEn: 'Advanced' },
           { id: 'history', label: 'इतिहास', labelEn: 'History' }
         ].map(tab => (
           <button
@@ -175,6 +228,17 @@ function WeatherPage({ selectedCrop }) {
 
       {/* Content */}
       <div className="p-4 space-y-4">
+        {/* Location panel (search + favorites) */}
+        <div className={`card p-3 ${showLocationPanel ? '' : 'hidden'}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <LocationSearch onSelect={handleLocationSelect} />
+            </div>
+            <div>
+              <FavoritesList onSelect={handleLocationSelect} />
+            </div>
+          </div>
+        </div>
         
         {/* Current Weather Tab */}
         {activeTab === 'current' && currentWeather && (
@@ -269,6 +333,12 @@ function WeatherPage({ selectedCrop }) {
         {activeTab === 'forecast' && (
           <>
             {/* API Forecast */}
+            {forecast?.hourly && (
+              <div className="card">
+                <HourlyTimeline hourly={forecast.hourly} />
+              </div>
+            )}
+
             {forecast?.daily && (
               <div className="card">
                 <h3 className="font-semibold mb-3 dark:text-white">5 दिवसांचा अंदाज (OpenWeather)</h3>
@@ -286,11 +356,12 @@ function WeatherPage({ selectedCrop }) {
                           <p className="text-xs text-gray-500 dark:text-gray-400">{getConditionMarathi(day.condition)}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold dark:text-white">{day.tempMax}° / {day.tempMin}°</p>
-                        {day.pop > 0 && (
-                          <p className="text-xs text-blue-500">💧 {Math.round(day.pop * 100)}%</p>
-                        )}
+                      <div className="text-right flex items-center gap-3">
+                        <div className="text-sm font-semibold dark:text-white">{day.tempMax}°</div>
+                        <div className="text-xs text-gray-500">{day.tempMin}°</div>
+                        <div className="ml-2 inline-flex items-center gap-1">
+                          <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">💧 {Math.round((day.pop || 0) * 100)}%</span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -417,6 +488,13 @@ function WeatherPage({ selectedCrop }) {
                 </div>
               </div>
             ))}
+          </>
+        )}
+
+        {/* Advanced Metrics Tab */}
+        {activeTab === 'advanced' && (
+          <>
+            <AdvancedMetrics history={history} forecast={forecast?.daily || []} crop={selectedCrop} />
           </>
         )}
 
